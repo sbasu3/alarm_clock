@@ -28,22 +28,54 @@ end
 function love.update(dt)
 	T = T+dt
 	if ( T - lasttime > 10) then
+		print("Lasttime:"..lasttime)
 		lasttime = T
+		print("Time:"..T)
 		save = ltn12.sink.table(response)
 		a,b,c = http.request {method="GET",url = weather_url,sink = save }
 		data = json.decode(response[1])
+		if data == nil then
+			print("Error in fetching data")
+		else
+			print("Data fetched successfully")
+		end
+
 	end
 end
  
 function love.draw()
-    view({w=160,h=60,x=30,y=0},"Temp:"..(tonumber(data.main.temp)-273),carbon_font_20)
-    --view({w=160,h=60,x=30,y=0},data.name,carbon_font_20)
-    view({w=160,h=60,x=190,y=0},os.date("%x"),carbon_font_20)
-    --view({w=160,h=60,x=190,y=0},data.main.temp,carbon_font_20)
-    view({w=160,h=60,x=350,y=0},"Humidity:"..data.main.humidity.."%",carbon_font_20)
-    view({w=160,h=60,x=30,y=280},"Sbasu3",carbon_font_20)
-    view({w=160,h=60,x=190,y=280},"Wind:"..data.wind.speed.."KM/Hr",carbon_font_20)
-    view({w=160,h=60,x=350,y=280},"Clouds:"..data.clouds.all.."%",carbon_font_20)
-    view({w=280,h=140,x=200,y=90},os.date("%X"),carbon_font_80)
-    love.graphics.draw(sunny,30,90);
+    if data == nil then
+		view({w=480,h=320,x=0,y=0},"Fetching Data",carbon_font_40)
+	else
+		view({w=160,h=60,x=30,y=0},"Temp:"..(tonumber(data.main.temp)-273),carbon_font_20)
+		view({w=160,h=60,x=190,y=0},os.date("%x"),carbon_font_20)
+		view({w=160,h=60,x=350,y=0},"Humidity:"..data.main.humidity.."%",carbon_font_20)
+		view({w=160,h=60,x=30,y=280},"Sbasu3",carbon_font_20)
+		view({w=160,h=60,x=190,y=280},"Wind:"..data.wind.speed.."KM/Hr",carbon_font_20)
+		view({w=160,h=60,x=350,y=280},"Clouds:"..data.clouds.all.."%",carbon_font_20)
+		view({w=280,h=140,x=200,y=90},os.date("%X"),carbon_font_80)
+		--love.graphics.draw(sunny,30,90);
+
+		if data.weather[1].main == "Clear" then
+			love.graphics.draw(sunny,30,90);
+		elseif data.weather[1].main == "Clouds" then
+			love.graphics.draw(simple_cloud,30,90);
+		elseif data.weather[1].main == "Rain" then
+			love.graphics.draw(cloud,30,90);
+		elseif data.weather[1].main == "Thunderstorm" then
+			love.graphics.draw(thunder,30,90);
+		elseif data.weather[1].main == "Snow" then
+			love.graphics.draw(hail,30,90);
+		elseif data.weather[1].main == "Drizzle" then
+			love.graphics.draw(cloud,30,90);
+		elseif data.weather[1].main == "Mist" then
+			love.graphics.draw(cloud,30,90);
+		elseif data.weather[1].main == "Fog" then
+			love.graphics.draw(cloud,30,90);
+		elseif data.weather[1].main == "Smoke" then
+			love.graphics.draw(cloud,30,90);
+		elseif data.weather[1].main == "Dust" then
+			love.graphics.draw(cloud,30,90);
+		end
+	end
 end
