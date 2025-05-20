@@ -1,11 +1,11 @@
 local http = require("socket.http")
 local json = require("json")
-local ltn12 = require("ltn12")
+--local ltn12 = require("ltn12")
 require("./view")
 
 function love.load()
-	success = love.window.setMode(480,320,{fullscreen=false,vsync=true,resizable=flase})
-	T=11
+	success = love.window.setMode(480,320,{fullscreen=false,vsync=true,resizable=false})
+	T=0
 	lasttime = 0
 	weather_url = "http://api.openweathermap.org/data/2.5/weather?lat=12.88&lon=77.58&APPID=222bc56201e319d82a0c478a10ccb03c"
 	response ={}
@@ -31,9 +31,17 @@ function love.update(dt)
 		print("Lasttime:"..lasttime)
 		lasttime = T
 		print("Time:"..T)
-		save = ltn12.sink.table(response)
-		a,b,c = http.request {method="GET",url = weather_url,sink = save }
-		data = json.decode(response[1])
+		--save = ltn12.sink.table(response)
+		body, code, headers, status = http.request(weather_url)
+		if code ~= 200 then
+			print("Error in fetching data")
+			print("Code:"..code)
+			print("Status:"..status)
+			print("Headers:"..headers)
+		else
+			print("Data fetched successfully")
+		end
+		data = json.decode(body)
 		if data == nil then
 			print("Error in fetching data")
 		else
